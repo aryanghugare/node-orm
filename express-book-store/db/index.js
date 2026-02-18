@@ -1,5 +1,5 @@
-const drizzle = require('drizzle-orm');
+import { drizzle } from 'drizzle-orm/node-postgres';
 
 const db = drizzle(process.env.DATABASE_URL);
 
-module.exports = db;
+export default db;

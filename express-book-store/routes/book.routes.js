@@ -1,22 +1,21 @@
 import express from 'express';
 // const { BOOKS } = require('../db/book');
-import { booksTable } from '../models';
+import { booksTable } from '../models/index.js';
 import db from '../db/index.js';
-const router = express.Router();
+import { eq } from 'drizzle-orm';
+import { Router } from 'express';
+
+const router = Router();
 
 router.get('/', async (req, res) => {
 const books = await db.select().from(booksTable); 
-res.json(books);
+return res.status(200).json(books);
   
 });
 
 router.get('/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-
-  if (isNaN(id))
-    return res.status(400).json({ error: `id must be of type number` });
-
-  const book = await db.select().from(booksTable).where(booksTable.id.eq(id)).limit(1).execute(); // SELECT * from books where id = {id} limit 1
+  const id = req.params.id;
+  const book = await db.select().from(booksTable).where(eq(booksTable.id, id)).limit(1).execute(); // SELECT * from books where id = {id} limit 1
 
   if (!book)
     return res
@@ -44,15 +43,15 @@ router.post('/', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = req.params.id ;
 
   if (isNaN(id))
     return res.status(400).json({ error: `id must be of type number` });
 
   // const indexToDelete = BOOKS.findIndex((e) => e.id === id);
-booksTable.delete().where(booksTable.id.eq(id)).execute(); // DELETE from books where id = {id}
-const allBooks = await db.select().from(booksTable); // SELECT * from books
+  await booksTable.delete().where(eq(booksTable.id, id)).execute(); // DELETE from books where id = {id}
+  const allBooks = await db.select().from(booksTable); // SELECT * from books
   return res.status(200).json({ message: 'book deleted' , books: allBooks});
 });
 
-module.exports = router;
+export default router;

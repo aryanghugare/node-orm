@@ -1,5 +1,5 @@
-const {pgTable, serial, text, integer,uuid , varchar} = require('drizzle-orm/pg-core');
-const authorsTable = require('./author.model');
+import {pgTable, serial, text, integer,uuid , varchar} from 'drizzle-orm/pg-core';
+import { authorsTable } from './author.model.js';
 
 const booksTable = pgTable('books', {
   id: uuid().primaryKey(),
@@ -9,6 +9,6 @@ const booksTable = pgTable('books', {
 
 });
 
-module.exports = {
+export {
   booksTable
 };

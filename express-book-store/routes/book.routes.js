@@ -1,6 +1,7 @@
 import express from 'express';
 // const { BOOKS } = require('../db/book');
 import { booksTable } from '../models/index.js';
+import { authorsTable } from '../models/index.js';
 import db from '../db/index.js';
 import { eq, or, ilike, sql } from 'drizzle-orm';
 import { Router } from 'express';
@@ -51,7 +52,9 @@ console.log("Search results:", searchBooks);
 router.get('/:id', async (req, res) => {
   try {
     const id = req.params.id;
-    const book = await db.select().from(booksTable).where(eq(booksTable.id, id)).limit(1).execute(); // SELECT * from books where id = {id} limit 1
+    const book = await db.select().from(booksTable).where(eq(booksTable.id, id))
+.leftJoin(authorsTable, eq(booksTable.authorId, authorsTable.id)) // Join books with authors to get author details along with the book
+.limit(1).execute(); // SELECT * from books where id = {id} limit 1
   
     if (!book)
       return res
@@ -90,9 +93,11 @@ router.post('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
  try {
    const id = req.params.id ;
- 
-   // const indexToDelete = BOOKS.findIndex((e) => e.id === id);
-   await booksTable.delete().where(eq(booksTable.id, id)).execute(); // DELETE from books where id = {id}
+ console.log("Deleting book with id:", id);
+  const result =  await db.delete(booksTable).where(eq(booksTable.id, id)); // DELETE from books where id = {id}
+if(result.rowCount === 0){
+  return res.status(404).json({ error: `Book with id ${id} does not exist!` });
+}
    const allBooks = await db.select().from(booksTable); // SELECT * from books
    return res.status(200).json({ message: 'book deleted' , books: allBooks});
  } catch (error) {

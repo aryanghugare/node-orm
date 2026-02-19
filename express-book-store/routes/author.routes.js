@@ -76,6 +76,19 @@ console.log("hello");
 
 })
 
+router.get('/:id/books', async (req, res) => {
+const id = req.params.id;
+console.log("Fetching books of author with id:", id);
+try {
+    const books = await db.select().from(booksTable).where(eq(booksTable.authorId, id)).execute();
+    return res.status(200).json(books);
+} catch (error) {
+    return res.status(500).json({ error: 'Error while fetching the books of the author' });
+}
+
+
+})
+
 
 
 export default router;

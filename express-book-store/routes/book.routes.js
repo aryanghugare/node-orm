@@ -24,8 +24,6 @@ try {
     )
   );
 
-
-
  // Full-text search using PostgreSQL's built-in to_tsvector - more powerful and can use indexes effectively
 // const searchBooks = await db.select().from(booksTable).where(
 //   sql`to_tsvector('simple', ${booksTable.title}) @@ to_tsquery('simple', ${searchQuery})`
